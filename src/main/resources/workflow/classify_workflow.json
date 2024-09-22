@@ -1,0 +1,187 @@
+{
+  "createTime": 0,
+  "updateTime": 1726838695656,
+  "name": "match_classification_sub_workflow",
+  "description": "Classify match result and assign random counts for match categories",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "classify_match_task",
+      "taskReferenceName": "classify_match_task",
+      "inputParameters": {
+        "matchResult": "${workflow.input.matchResult}"
+      },
+      "type": "SIMPLE",
+      "decisionCases": {},
+      "defaultCase": [],
+      "forkTasks": [],
+      "startDelay": 0,
+      "joinOn": [],
+      "optional": false,
+      "defaultExclusiveJoinTask": [],
+      "asyncComplete": false,
+      "loopOver": [],
+      "onStateChange": {},
+      "permissive": false
+    },
+    {
+      "name": "assign_random_match_counts",
+      "taskReferenceName": "assign_random_match_counts",
+      "inputParameters": {
+        "PartialMatchCount": 1,
+        "FuzzyMatchCount": 8,
+        "ExactMatchCount": 2
+      },
+      "type": "SET_VARIABLE",
+      "decisionCases": {},
+      "defaultCase": [],
+      "forkTasks": [],
+      "startDelay": 0,
+      "joinOn": [],
+      "optional": false,
+      "defaultExclusiveJoinTask": [],
+      "asyncComplete": false,
+      "loopOver": [],
+      "onStateChange": {},
+      "permissive": false
+    },
+    {
+      "name": "match_category_switch",
+      "taskReferenceName": "match_category_switch",
+      "inputParameters": {
+        "switchCaseValue": "${classify_match_task.output.matchCategory}"
+      },
+      "type": "SWITCH",
+      "decisionCases": {
+        "ExactMatch": [
+          {
+            "name": "set_exact_match",
+            "taskReferenceName": "set_exact_match",
+            "inputParameters": {
+              "ExactMatchCount": "${assign_random_match_counts.input.ExactMatchCount}"
+            },
+            "type": "SET_VARIABLE",
+            "decisionCases": {},
+            "defaultCase": [],
+            "forkTasks": [],
+            "startDelay": 0,
+            "joinOn": [],
+            "optional": false,
+            "defaultExclusiveJoinTask": [],
+            "asyncComplete": false,
+            "loopOver": [],
+            "onStateChange": {},
+            "permissive": false
+          }
+        ],
+        "FuzzyMatch": [
+          {
+            "name": "set_fuzzy_match",
+            "taskReferenceName": "set_fuzzy_match",
+            "inputParameters": {
+              "FuzzyMatchCount": "${assign_random_match_counts.input.FuzzyMatchCount}"
+            },
+            "type": "SET_VARIABLE",
+            "decisionCases": {},
+            "defaultCase": [],
+            "forkTasks": [],
+            "startDelay": 0,
+            "joinOn": [],
+            "optional": false,
+            "defaultExclusiveJoinTask": [],
+            "asyncComplete": false,
+            "loopOver": [],
+            "onStateChange": {},
+            "permissive": false
+          }
+        ],
+        "PartialMatch": [
+          {
+            "name": "set_partial_match",
+            "taskReferenceName": "set_partial_match",
+            "inputParameters": {
+              "PartialMatchCount": "${assign_random_match_counts.input.PartialMatchCount}"
+            },
+            "type": "SET_VARIABLE",
+            "decisionCases": {},
+            "defaultCase": [],
+            "forkTasks": [],
+            "startDelay": 0,
+            "joinOn": [],
+            "optional": false,
+            "defaultExclusiveJoinTask": [],
+            "asyncComplete": false,
+            "loopOver": [],
+            "onStateChange": {},
+            "permissive": false
+          }
+        ]
+      },
+      "defaultCase": [
+        {
+          "name": "set_no_match",
+          "taskReferenceName": "set_no_match",
+          "inputParameters": {
+            "NoMatch": "No matching category"
+          },
+          "type": "SET_VARIABLE",
+          "decisionCases": {},
+          "defaultCase": [],
+          "forkTasks": [],
+          "startDelay": 0,
+          "joinOn": [],
+          "optional": false,
+          "defaultExclusiveJoinTask": [],
+          "asyncComplete": false,
+          "loopOver": [],
+          "onStateChange": {},
+          "permissive": false
+        }
+      ],
+      "forkTasks": [],
+      "startDelay": 0,
+      "joinOn": [],
+      "optional": false,
+      "defaultExclusiveJoinTask": [],
+      "asyncComplete": false,
+      "loopOver": [],
+      "evaluatorType": "value-param",
+      "expression": "switchCaseValue",
+      "onStateChange": {},
+      "permissive": false
+    },
+    {
+      "name": "final_output_variables",
+      "taskReferenceName": "final_output_variables",
+      "inputParameters": {
+        "PartialMatchCount": "${assign_random_match_counts.input.PartialMatchCount}",
+        "FuzzyMatchCount": "${assign_random_match_counts.input.FuzzyMatchCount}",
+        "WorkflowId": "${workflow.workflowId}",
+        "ExactMatchCount": "${assign_random_match_counts.input.ExactMatchCount}"
+      },
+      "type": "SET_VARIABLE",
+      "decisionCases": {},
+      "defaultCase": [],
+      "forkTasks": [],
+      "startDelay": 0,
+      "joinOn": [],
+      "optional": false,
+      "defaultExclusiveJoinTask": [],
+      "asyncComplete": false,
+      "loopOver": [],
+      "onStateChange": {},
+      "permissive": false
+    }
+  ],
+  "inputParameters": [],
+  "outputParameters": {},
+  "schemaVersion": 2,
+  "restartable": true,
+  "workflowStatusListenerEnabled": false,
+  "ownerEmail": "Demo@gmail.com",
+  "timeoutPolicy": "ALERT_ONLY",
+  "timeoutSeconds": 0,
+  "variables": {},
+  "inputTemplate": {},
+  "enforceSchema": true
+}

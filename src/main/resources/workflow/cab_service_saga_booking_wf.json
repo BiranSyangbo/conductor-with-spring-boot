@@ -1,0 +1,191 @@
+{
+  "createTime": 0,
+  "updateTime": 1720786358179,
+  "name": "cab_service_saga_booking_wf",
+  "description": "Cab booking workflow demonstrating saga micro service pattern",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "book_ride",
+      "taskReferenceName": "book_ride_ref",
+      "inputParameters": {
+        "bookingRequest": "${workflow.input.bookingRequest}"
+      },
+      "type": "SIMPLE",
+      "decisionCases": {},
+      "defaultCase": [],
+      "forkTasks": [],
+      "startDelay": 0,
+      "joinOn": [],
+      "optional": false,
+      "defaultExclusiveJoinTask": [],
+      "asyncComplete": false,
+      "loopOver": [],
+      "onStateChange": {},
+      "permissive": false
+    },
+    {
+      "name": "assign_driver",
+      "taskReferenceName": "assign_driver_ref",
+      "inputParameters": {
+        "bookingId": "${book_ride_ref.output.bookingId}"
+      },
+      "type": "SIMPLE",
+      "decisionCases": {},
+      "defaultCase": [],
+      "forkTasks": [],
+      "startDelay": 0,
+      "joinOn": [],
+      "optional": false,
+      "defaultExclusiveJoinTask": [],
+      "asyncComplete": false,
+      "loopOver": [],
+      "onStateChange": {},
+      "permissive": false
+    },
+    {
+      "name": "make_payment",
+      "taskReferenceName": "make_payment_ref",
+      "inputParameters": {
+        "bookingId": "${assign_driver_ref.output.bookingId}",
+        "riderId": "${workflow.input.bookingRequest.riderId}"
+      },
+      "type": "SIMPLE",
+      "decisionCases": {},
+      "defaultCase": [],
+      "forkTasks": [],
+      "startDelay": 0,
+      "joinOn": [],
+      "optional": false,
+      "defaultExclusiveJoinTask": [],
+      "asyncComplete": false,
+      "loopOver": [],
+      "onStateChange": {},
+      "permissive": false
+    },
+    {
+      "name": "confirm_booking",
+      "taskReferenceName": "confirm_booking_ref",
+      "inputParameters": {
+        "bookingId": "${assign_driver_ref.output.bookingId}"
+      },
+      "type": "SIMPLE",
+      "decisionCases": {},
+      "defaultCase": [],
+      "forkTasks": [],
+      "startDelay": 0,
+      "joinOn": [],
+      "optional": false,
+      "defaultExclusiveJoinTask": [],
+      "asyncComplete": false,
+      "loopOver": [],
+      "onStateChange": {},
+      "permissive": false
+    },
+    {
+      "name": "fork_task_notifications",
+      "taskReferenceName": "fork_task_notifications_ref",
+      "inputParameters": {},
+      "type": "FORK_JOIN",
+      "decisionCases": {},
+      "defaultCase": [],
+      "forkTasks": [
+        [
+          {
+            "name": "notify_customer",
+            "taskReferenceName": "notify_customer_ref",
+            "inputParameters": {
+              "riderId": "${workflow.input.bookingRequest.riderId}",
+              "driverId": "${assign_driver_ref.output.driverId}",
+              "dropOffLocation": "${workflow.input.bookingRequest.dropOffLocation}",
+              "bookingId": "${book_ride_ref.output.bookingId}",
+              "pickUpLocation": "${workflow.input.bookingRequest.pickUpLocation}"
+            },
+            "type": "SIMPLE",
+            "decisionCases": {},
+            "defaultCase": [],
+            "forkTasks": [],
+            "startDelay": 0,
+            "joinOn": [],
+            "optional": false,
+            "defaultExclusiveJoinTask": [],
+            "asyncComplete": false,
+            "loopOver": [],
+            "onStateChange": {},
+            "permissive": false
+          }
+        ],
+        [
+          {
+            "name": "notify_driver",
+            "taskReferenceName": "notify_driver_ref",
+            "inputParameters": {
+              "bookingId": "${book_ride_ref.output.bookingId}",
+              "driverId": "${assign_driver_ref.output.driverId}",
+              "pickUp": "${workflow.input.bookingRequest.pickUpLocation}",
+              "dropOff": "${workflow.input.bookingRequest.dropOffLocation}"
+            },
+            "type": "SIMPLE",
+            "decisionCases": {},
+            "defaultCase": [],
+            "forkTasks": [],
+            "startDelay": 0,
+            "joinOn": [],
+            "optional": false,
+            "defaultExclusiveJoinTask": [],
+            "asyncComplete": false,
+            "loopOver": [],
+            "onStateChange": {},
+            "permissive": false
+          }
+        ]
+      ],
+      "startDelay": 0,
+      "joinOn": [],
+      "optional": false,
+      "defaultExclusiveJoinTask": [],
+      "asyncComplete": false,
+      "loopOver": [],
+      "onStateChange": {},
+      "permissive": false
+    },
+    {
+      "name": "join_task_notifications",
+      "taskReferenceName": "join_task_notifications_ref",
+      "inputParameters": {},
+      "type": "JOIN",
+      "decisionCases": {},
+      "defaultCase": [],
+      "forkTasks": [],
+      "startDelay": 0,
+      "joinOn": [
+        "notify_customer_ref",
+        "notify_driver_ref"
+      ],
+      "optional": false,
+      "defaultExclusiveJoinTask": [],
+      "asyncComplete": false,
+      "loopOver": [],
+      "onStateChange": {},
+      "permissive": false
+    }
+  ],
+  "inputParameters": [
+    "pickUpLocation",
+    "dropOffLocation",
+    "riderId"
+  ],
+  "outputParameters": {
+    "bookingId": "${book_ride_ref.output.bookingId}"
+  },
+  "failureWorkflow": "cab_service_saga_cancellation_wf",
+  "schemaVersion": 2,
+  "restartable": true,
+  "workflowStatusListenerEnabled": false,
+  "ownerEmail": "manan.bhatt@orkes.io",
+  "timeoutPolicy": "ALERT_ONLY",
+  "timeoutSeconds": 0,
+  "variables": {},
+  "inputTemplate": {},
+  "enforceSchema": true
+}

@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "conductor.server.url",
+      "type": "java.lang.String",
+      "description": "Description for conductor.server.url."
+  }
+] }
