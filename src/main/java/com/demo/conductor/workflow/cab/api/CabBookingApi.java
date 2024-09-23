@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/cab")
-public class CabBookingController {
+public class CabBookingApi {
 
     private final CabWorkflowService cabWorkflowService;
 
